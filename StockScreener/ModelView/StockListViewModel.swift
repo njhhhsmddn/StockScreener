@@ -6,26 +6,30 @@
 //
 import Foundation
 
-import SwiftUI
 
 class StockListViewModel: ObservableObject {
     @Published var stocks: [StockListModel] = []
+    @Published var searchResults: [SearchStockModel] = []
     
     private let apiKey = "5NT266T5BEMJWU3Y"
 
     func fetchCSV() {
         let urlString = "https://www.alphavantage.co/query?function=LISTING_STATUS&apikey=\(apiKey)"
-        guard let url = URL(string: urlString) else { return }
         
-        URLSession.shared.dataTask(with: url) { data, _, error in
-            if let data = data, let csvString = String(data: data, encoding: .utf8) {
-                DispatchQueue.main.async {
-                    self.stocks = self.parseCSV(csvString)
+        NetworkManager.shared.fetchRawData(urlString: urlString) { result in
+            switch result {
+            case .success(let data):
+                if let csvString = String(data: data, encoding: .utf8) {
+                    DispatchQueue.main.async {
+                        self.stocks = self.parseCSV(csvString)
+                    }
+                } else {
+                    print("Failed to convert CSV data to string")
                 }
-            } else {
-                print("Error fetching CSV: \(error?.localizedDescription ?? "Unknown error")")
+            case .failure(let error):
+                print("Error fetching CSV: \(error)")
             }
-        }.resume()
+        }
     }
     
     private func parseCSV(_ csvString: String) -> [StockListModel] {
@@ -45,5 +49,44 @@ class StockListViewModel: ObservableObject {
             )
         }
     }
+    
+    func searchStocks(query: String) {
+        guard !query.isEmpty else {
+            DispatchQueue.main.async { self.searchResults = [] }
+            return
+        }
+
+        let urlString = "https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=\(query)&apikey=\(apiKey)"
+
+        NetworkManager.shared.fetch(urlString: urlString, decodingType: [String: [SearchStockModel]].self) { result in
+            switch result {
+            case .success(let response):
+                DispatchQueue.main.async {
+                    self.searchResults = response["bestMatches"] ?? []
+                    print("Search bar results: \(self.searchResults)")
+                }
+            case .failure(let error):
+                print("Error fetching search results: \(error)")
+            }
+        }
+    }
+    
+    var filteredStocks: [StockListModel] {
+            if searchResults.isEmpty {
+                return stocks  // Show all stocks if no search
+            } else {
+                let allMatch = stocks.allSatisfy { stock in
+                    searchResults.contains { $0.symbol == stock.symbol }
+                }
+
+                let searchFilter = allMatch ? stocks : stocks.filter { stock in
+                    searchResults.contains { $0.symbol == stock.symbol }
+                }
+
+                print("result compare \(searchFilter)")
+                return searchFilter
+               
+            }
+        }
 }
 
