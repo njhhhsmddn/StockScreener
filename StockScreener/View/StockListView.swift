@@ -55,7 +55,7 @@ struct StockListView: View {
                 
                 // Stock List
                 List(viewModel.filteredStocks) { stock in
-                    NavigationLink(destination: StockDetailView(stock: stock)) {
+                    NavigationLink(destination: StockDetailsView(stock: stock)) {
                         StockRow(stock: stock, isWatchlisted: watchlist.contains(stock)) {
                             addToWatchlist(stock)
                         }
