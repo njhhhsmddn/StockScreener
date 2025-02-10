@@ -81,7 +81,7 @@ struct StockDetailsView: View {
         }
         .padding()
         .onAppear {
-            viewModel.fetchStockData()
+            viewModel.fetchStockData(stock: stock)
         }
     }
 }

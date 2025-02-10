@@ -7,8 +7,8 @@
 
 import Foundation
 
-struct StockListModel: Identifiable, Equatable {
-    let id = UUID()
+struct StockListModel: Identifiable, Codable {
+    var id = UUID()
     let symbol: String
     let name: String
     let exchange: String
@@ -16,9 +16,5 @@ struct StockListModel: Identifiable, Equatable {
     let ipoDate: String
     let delistingDate: String
     let status: String
-    
-    static func == (lhs: StockListModel, rhs: StockListModel) -> Bool {
-            return lhs.symbol == rhs.symbol
-        }
 }
 
