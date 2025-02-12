@@ -8,13 +8,13 @@
 import Foundation
 
 struct StockListModel: Identifiable, Codable {
-    var id = UUID()
+    var id: String { symbol }
     let symbol: String
     let name: String
     let exchange: String
     let assetType: String
     let ipoDate: String
-    let delistingDate: String
-    let status: String
+    let delistingDate: String?
+    let status: String?
 }
 
