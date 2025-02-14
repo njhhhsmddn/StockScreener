@@ -44,12 +44,8 @@ struct StockListView: View {
                                                 viewModel.toggleWatchlist(stock: stock)
                                             }
                                         }
-                                    .background(Color.teal.gradient, in: RoundedRectangle(cornerRadius: 10))
-                                    .listRowSeparator(.hidden)
-                                    
-//                                        .listRowSeparator(.hidden)
-//                                        .background(Color.black.gradient, in: RoundedRectangle(cornerRadius: 10))
-//                                        .cornerRadius(8)
+                                        .background(Color.teal.gradient, in: RoundedRectangle(cornerRadius: 10))
+                                        .listRowSeparator(.hidden)
                                     }
                                     .listRowSeparator(.hidden)
                                     .foregroundStyle(Color.clear)

@@ -28,19 +28,3 @@ struct StockDetails: Codable {
         case eps = "EPS"
     }
 }
-
-struct StockChart: Codable {
-    let monthlyTimeSeries: [String: StockPrice]
-
-    enum CodingKeys: String, CodingKey {
-        case monthlyTimeSeries = "Monthly Time Series"
-    }
-}
-
-struct StockPrice: Codable {
-    let close: String
-
-    enum CodingKeys: String, CodingKey {
-        case close = "4. close"
-    }
-}
