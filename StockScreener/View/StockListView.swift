@@ -8,9 +8,11 @@
 import SwiftUI
 
 struct StockListView: View {
+    @EnvironmentObject var watchlistViewModel: MyWatchlistViewModel
     @ObservedObject var viewModel: StockListViewModel
     @State private var searchText = ""
     @State private var showCancelButton: Bool = false
+    
     
     var filteredStocks: [StockListModel] {
             if searchText.isEmpty {
@@ -40,8 +42,8 @@ struct StockListView: View {
                             List(filteredStocks) { stock in
                                 HStack{
                                     NavigationLink(destination: StockDetailsView(stock: stock)) {
-                                        StockRow(stock: stock, isWatchlisted: viewModel.watchlist.contains(where: { $0.symbol == stock.symbol })) {
-                                                viewModel.toggleWatchlist(stock: stock)
+                                        StockRow(stock: stock, isWatchlisted: watchlistViewModel.watchlist.contains(where: { $0.symbol == stock.symbol })) {
+                                            watchlistViewModel.toggleWatchlist(stock: stock)
                                             }
                                         }
                                         .background(Color.teal.gradient, in: RoundedRectangle(cornerRadius: 10))
@@ -92,11 +94,11 @@ struct StockRow: View {
     }
 }
 
-#Preview {
-    let mockViewModel = StockListViewModel()
-       mockViewModel.watchlist = [
-        StockListModel(symbol: "ABC", name: "ABC DEFG", exchange: "", assetType: "", ipoDate: "", delistingDate: "", status: ""),
-        StockListModel(symbol: "TESC", name: "tesco", exchange: "", assetType: "", ipoDate: "", delistingDate: "", status: "")
-       ]
-    return StockListView(viewModel: mockViewModel)
-}
+//#Preview {
+//    let mockViewModel = StockListViewModel()
+//    mockViewModel.stocks = [
+//        StockListModel(symbol: "ABC", name: "ABC DEFG", exchange: "", assetType: "", ipoDate: "", delistingDate: "", status: ""),
+//        StockListModel(symbol: "TESC", name: "tesco", exchange: "", assetType: "", ipoDate: "", delistingDate: "", status: "")
+//       ]
+//    StockListView(viewModel: mockViewModel)
+//}

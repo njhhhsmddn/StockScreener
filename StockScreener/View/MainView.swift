@@ -13,14 +13,15 @@ enum StockTab {
 }
 
 struct MainView: View {
-    @StateObject var viewModel = StockListViewModel()
+    @StateObject var stockListViewModel = StockListViewModel()
+    
     
     var body: some View {
         TabView {
-            StockListView(viewModel: viewModel)
+            StockListView(viewModel: stockListViewModel)
                 .tabItem { Label("Stocks", systemImage: "chart.bar") }
             
-            MyWatchlistView(viewModel: viewModel)
+            MyWatchlistView()
                 .tabItem { Label("Watchlist", systemImage: "star") }
         }
     }

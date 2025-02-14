@@ -9,9 +9,12 @@ import SwiftUI
 
 @main
 struct StockScreenerApp: App {
+    @StateObject var watchlistViewModel = MyWatchlistViewModel()
+    
     var body: some Scene {
         WindowGroup {
             MainView()
+                .environmentObject(watchlistViewModel)
         }
     }
 }

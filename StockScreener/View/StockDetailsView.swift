@@ -10,32 +10,32 @@ import Charts
 
 struct StockDetailsView: View {
     @Environment(\.dismiss) private var dismiss
-    
+    @EnvironmentObject var watchlistViewModel: MyWatchlistViewModel
     let stock: StockListModel
-    
-    @StateObject var stockListViewModel = StockListViewModel()
     @StateObject var viewModel = StockDetailsViewModel()
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
+                // Back button and star button
                 HStack {
                     Button(action: { dismiss() }) {
                                     Image(systemName: "arrow.backward")
                                         .foregroundColor(.blue)
-                                        .padding(.vertical, 8) // Small padding for better tap area
+                                        .padding(.vertical, 8)
                                         .contentShape(Rectangle())
                                 }
                     Spacer()
                     Button(action: {
-                        stockListViewModel.toggleWatchlist(stock: stock)
+                        watchlistViewModel.toggleWatchlist(stock: stock)
                     }) {
-                        Image(systemName: stockListViewModel.watchlist.contains(where: { $0.symbol == stock.symbol }) ? "star.fill" : "star")
-                            .foregroundColor(stockListViewModel.watchlist.contains(where: { $0.symbol == stock.symbol }) ? .yellow : .gray)
+                        Image(systemName: watchlistViewModel.watchlist.contains(where: { $0.symbol == stock.symbol }) ? "star.fill" : "star")
+                            .foregroundColor(watchlistViewModel.watchlist.contains(where: { $0.symbol == stock.symbol }) ? .yellow : .gray)
                     }
-                    .frame(width: 55, height: 55) // Better tap area
+                    .frame(width: 55, height: 55)
                     
                 }
+                
                 // Stock Header
                 HStack {
                     Image(systemName: "chart.line.uptrend.xyaxis")
@@ -55,24 +55,14 @@ struct StockDetailsView: View {
                     Text(viewModel.currentPrice != 0 ? "$\(String(format: "%.2f", viewModel.currentPrice))" : "$0")
                         .font(.title)
                         .bold()
-                    Spacer()
-                    Image(systemName: viewModel.percentageChange > 0 ? "arrowshape.up" : "arrowshape.down")
-                        .resizable()
-                        .frame(width: 12, height: 12)
-                        .foregroundStyle(viewModel.percentageChange > 0 ? .green : .red)
-                    
-                    Text(viewModel.percentageChange != 0 ? "\(String(format: "%.2f", viewModel.percentageChange))%" : "0")
-                        .foregroundStyle(viewModel.percentageChange > 0 ? .green : .red)
                 }
                 .padding(.horizontal)
 
-                // Chart with Adaptive Height
-    
+                // Chart
                 LineChartView(stockPrices: viewModel.stockChart)
                     .frame(height: 400)
                     .padding(.horizontal)
                
-                
                 // Market Info Cards
                 VStack(spacing: 12) {
                     HStack(spacing: 16) {
@@ -113,10 +103,10 @@ struct StockDetailsView: View {
             }
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: {
-                    stockListViewModel.toggleWatchlist(stock: stock)
+                    watchlistViewModel.toggleWatchlist(stock: stock)
                 }) {
-                    Image(systemName: stockListViewModel.watchlist.contains(where: { $0.symbol == stock.symbol }) ? "star.fill" : "star")
-                        .foregroundColor(stockListViewModel.watchlist.contains(where: { $0.symbol == stock.symbol }) ? .yellow : .gray)
+                    Image(systemName: watchlistViewModel.watchlist.contains(where: { $0.symbol == stock.symbol }) ? "star.fill" : "star")
+                        .foregroundColor(watchlistViewModel.watchlist.contains(where: { $0.symbol == stock.symbol }) ? .yellow : .gray)
                 }
                 .frame(width: 44, height: 44) // Better tap area
             }

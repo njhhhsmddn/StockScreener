@@ -17,14 +17,14 @@ class StockDetailsViewModel: BaseViewModel {
     @Published var week52High: Double?
     @Published var week52Low: Double?
     @Published var stockName: String = "Loading..."
-    @Published var percentageChange: Double = 0
+   
     
     func fetchStockData(stock: StockListModel) {
         let stockDetailsURL = "https://www.alphavantage.co/query?function=OVERVIEW&symbol=\(stock.symbol)&apikey=\(apiKey)"
         let timeSeriesURL = "https://www.alphavantage.co/query?function=TIME_SERIES_MONTHLY&symbol=\(stock.symbol)&apikey=\(apiKey)"
 
         fetchStockDetails(urlString: stockDetailsURL)
-        fetchTimeSeries(urlString: timeSeriesURL)
+        fetchTimeSeriesMonthly(urlString: timeSeriesURL)
     }
     
     func formattedNumber(numberString: String) -> String{
@@ -60,7 +60,7 @@ class StockDetailsViewModel: BaseViewModel {
             .store(in: &cancellables)
     }
     
-    private func fetchTimeSeries(urlString: String) {
+    private func fetchTimeSeriesMonthly(urlString: String) {
         isLoading = true
         fetchData(from: urlString, expectingCSV: false)
             .sink(receiveCompletion: { [weak self] completion in
@@ -98,7 +98,7 @@ class StockDetailsViewModel: BaseViewModel {
                         
                         
                         self?.currentPrice = currentPrice
-                        self?.percentageChange = Double(formattedPercentageChange) ?? 0
+//                        self?.percentageChange = Double(formattedPercentageChange) ?? 0
                     }
                 }
             })

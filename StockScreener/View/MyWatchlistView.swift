@@ -8,19 +8,35 @@
 import SwiftUI
 
 struct MyWatchlistView: View {
-    @ObservedObject var viewModel: StockListViewModel
+    @EnvironmentObject var viewModel: MyWatchlistViewModel
     
     var body: some View {
          NavigationView {
              VStack {
                  List {
-                     ForEach(viewModel.watchlist) { stock in
-//                         NavigationLink(destination: StockDetailsView(stock: stock)) {
-                             ListCell(stock: stock, isWatchlisted: true) {
+                     ForEach(viewModel.watchlist, id: \.id) { stock in
+                         if let stockInfo = viewModel.stockDetails[stock.symbol] {
+                             ListCell(
+                                 stock: stock,
+                                 isWatchlisted: true,
+                                 currentPrice: stockInfo.currentPrice,
+                                 percentageChange: stockInfo.percentageChange
+                             ) {
                                  viewModel.toggleWatchlist(stock: stock)
                              }
-//                         }
-                         .listRowSeparator(.hidden)
+                             .listRowSeparator(.hidden)
+                         } else {
+                             // Show a placeholder while data loads
+                             ListCell(
+                                 stock: stock,
+                                 isWatchlisted: true,
+                                 currentPrice: 0.0,
+                                 percentageChange: 0.0
+                             ) {
+                                 viewModel.toggleWatchlist(stock: stock)
+                             }
+                             .listRowSeparator(.hidden)
+                         }
                          
                      }
                      .onMove(perform: moveRow) // Enable row moving
@@ -41,48 +57,11 @@ struct MyWatchlistView: View {
     }
 }
 
-struct MyWatchlistRow: View {
-    let stock: StockListModel
-    let isWatchlisted: Bool
-    let action: () -> Void
-
-    var body: some View {
-        HStack {
-            VStack(alignment: .leading) {
-                Text(stock.symbol)
-                    .font(.headline)
-                    .foregroundStyle(Color.white)
-                Text(stock.name)
-                    .font(.subheadline)
-                    .foregroundStyle(Color.white)
-            }
-            .padding()
-            Spacer()
-            VStack(alignment: .trailing) {
-                Text(stock.symbol)
-                    .font(.headline)
-                    .foregroundStyle(Color.white)
-                Text(stock.name)
-                    .font(.subheadline)
-                    .foregroundStyle(Color.white)
-            }
-            .padding(.trailing, 5)
-            
-            Button(action: action) {
-                Image(systemName: isWatchlisted ? "star.fill" : "star")
-                    .foregroundColor(isWatchlisted ? .yellow : .gray)
-            }
-            .padding()
-            
-        }
-        .buttonStyle(BorderlessButtonStyle())
-
-    }
-}
-
 struct ListCell: View {
     let stock: StockListModel
     let isWatchlisted: Bool
+    let currentPrice: Double
+    let percentageChange: Double
     let action: () -> Void
     var body: some View {
         ZStack(alignment: .leading) {
@@ -97,13 +76,21 @@ struct ListCell: View {
                 }
                 .padding()
                 Spacer()
-                VStack(alignment: .trailing) {
-                    Text(stock.symbol)
+                VStack(alignment: .trailing, spacing: 0) {
+                    Text(String(format: "$%.2f", currentPrice))
                         .font(.headline)
                         .foregroundStyle(Color.white)
-                    Text(stock.name)
-                        .font(.subheadline)
-                        .foregroundStyle(Color.white)
+                    HStack{
+                        Image(systemName: percentageChange > 0 ? "arrowshape.up" : "arrowshape.down")
+                            .resizable()
+                            .frame(width: 12, height: 12)
+                            .foregroundStyle(percentageChange > 0 ? .black : .red)
+                        
+                        Text(String(format: "%.2f%%", percentageChange))
+                            .font(.subheadline)
+                            .foregroundStyle(percentageChange > 0 ? Color.black : Color.red)
+                    }
+                    
                 }
                 .padding(.trailing, 5)
                 
@@ -119,8 +106,7 @@ struct ListCell: View {
             }
             .opacity(0.0)
         }
-        
-        .frame(height: 50)
+        .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal)
         .background(Color.teal.gradient, in: RoundedRectangle(cornerRadius: 10))
         .foregroundColor(.white)
@@ -129,10 +115,5 @@ struct ListCell: View {
 }
 
 #Preview {
-    let mockViewModel = StockListViewModel()
-       mockViewModel.watchlist = [
-        StockListModel(symbol: "ABC", name: "ABC DEFG", exchange: "", assetType: "", ipoDate: "", delistingDate: "", status: ""),
-        StockListModel(symbol: "TESC", name: "tesco", exchange: "", assetType: "", ipoDate: "", delistingDate: "", status: "")
-       ]
-    return MyWatchlistView(viewModel: mockViewModel)
+    MyWatchlistView()
 }
