@@ -38,6 +38,10 @@ struct StockListView: View {
                             Text("No data available.")
                             .foregroundColor(.gray)
                             .padding()
+                        } else if filteredStocks.isEmpty && !searchText.isEmpty {
+                            Text("No match found.")
+                            .foregroundColor(.gray)
+                            .padding()
                         } else {
                             List(filteredStocks) { stock in
                                 HStack{
