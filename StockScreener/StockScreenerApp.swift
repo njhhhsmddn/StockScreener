@@ -15,6 +15,7 @@ struct StockScreenerApp: App {
         WindowGroup {
             MainView()
                 .environmentObject(watchlistViewModel)
+                .preferredColorScheme(.light)
         }
     }
 }
