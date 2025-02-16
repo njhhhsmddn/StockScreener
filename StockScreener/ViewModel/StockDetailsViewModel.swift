@@ -26,15 +26,6 @@ class StockDetailsViewModel: BaseViewModel {
         fetchStockDetails(urlString: stockDetailsURL)
         fetchTimeSeriesMonthly(urlString: timeSeriesURL)
     }
-    
-    func formattedNumber(numberString: String) -> String{
-        if let number = Int(numberString) {
-            let formatter = NumberFormatter()
-            formatter.numberStyle = .decimal
-            return formatter.string(from: NSNumber(value: number)) ?? numberString
-        }
-        return numberString
-    }
 
     private func fetchStockDetails(urlString: String) {
         isLoading = true
@@ -103,6 +94,15 @@ class StockDetailsViewModel: BaseViewModel {
                 }
             })
             .store(in: &cancellables)
+    }
+    
+    func formattedNumber(numberString: String) -> String {
+        if let number = Int(numberString) {
+            let formatter = NumberFormatter()
+            formatter.numberStyle = .decimal
+            return formatter.string(from: NSNumber(value: number)) ?? numberString
+        }
+        return numberString
     }
 }
 

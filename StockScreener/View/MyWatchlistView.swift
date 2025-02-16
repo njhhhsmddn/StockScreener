@@ -13,41 +13,49 @@ struct MyWatchlistView: View {
     var body: some View {
          NavigationView {
              VStack {
-                 List {
-                     ForEach(viewModel.watchlist, id: \.id) { stock in
-                         if let stockInfo = viewModel.stockDetails[stock.symbol] {
-                             ListCell(
-                                 stock: stock,
-                                 isWatchlisted: true,
-                                 currentPrice: stockInfo.currentPrice,
-                                 percentageChange: stockInfo.percentageChange
-                             ) {
-                                 viewModel.toggleWatchlist(stock: stock)
+                 if viewModel.watchlist.isEmpty {
+                     Text("You have no watchlist yet!")
+                     .foregroundColor(.gray)
+                     .padding()
+                 } else {
+                     List {
+                         ForEach(viewModel.watchlist, id: \.id) { stock in
+                             if let stockInfo = viewModel.stockDetails[stock.symbol] {
+                                 ListCell(
+                                     stock: stock,
+                                     isWatchlisted: true,
+                                     currentPrice: stockInfo.currentPrice,
+                                     percentageChange: stockInfo.percentageChange
+                                 ) {
+                                     viewModel.toggleWatchlist(stock: stock)
+                                 }
+                                 .listRowSeparator(.hidden)
+                             } else {
+                                 // Show a placeholder while data loads
+                                 ListCell(
+                                     stock: stock,
+                                     isWatchlisted: true,
+                                     currentPrice: 0.0,
+                                     percentageChange: 0.0
+                                 ) {
+                                     viewModel.toggleWatchlist(stock: stock)
+                                 }
+                                 .listRowSeparator(.hidden)
                              }
-                             .listRowSeparator(.hidden)
-                         } else {
-                             // Show a placeholder while data loads
-                             ListCell(
-                                 stock: stock,
-                                 isWatchlisted: true,
-                                 currentPrice: 0.0,
-                                 percentageChange: 0.0
-                             ) {
-                                 viewModel.toggleWatchlist(stock: stock)
-                             }
-                             .listRowSeparator(.hidden)
+                             
                          }
+                         .onMove(perform: moveRow) // Enable row moving
                          
                      }
-                     .onMove(perform: moveRow) // Enable row moving
-                     
+                     .listStyle(.plain)
                  }
-                 .listStyle(.plain)
              }
              .navigationTitle("My Watchlist")
              .navigationBarTitleDisplayMode(.inline)
                  .toolbar {
-                     EditButton()
+                     if !viewModel.watchlist.isEmpty {
+                        EditButton()
+                    }
                  }
          }
      }

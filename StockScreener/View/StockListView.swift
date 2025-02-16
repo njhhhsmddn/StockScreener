@@ -12,7 +12,7 @@ struct StockListView: View {
     @ObservedObject var viewModel: StockListViewModel
     @State private var searchText = ""
     @State private var showCancelButton: Bool = false
-    
+    @State private var showToast = false
     
     var filteredStocks: [StockListModel] {
             if searchText.isEmpty {
@@ -44,6 +44,9 @@ struct StockListView: View {
                                     NavigationLink(destination: StockDetailsView(stock: stock)) {
                                         StockRow(stock: stock, isWatchlisted: watchlistViewModel.watchlist.contains(where: { $0.symbol == stock.symbol })) {
                                             watchlistViewModel.toggleWatchlist(stock: stock)
+                                            if watchlistViewModel.watchlist.contains(where: { $0.symbol == stock.symbol }) {
+                                                showToast.toggle()
+                                            }
                                             }
                                         }
                                         .background(Color.teal.gradient, in: RoundedRectangle(cornerRadius: 10))
@@ -60,7 +63,7 @@ struct StockListView: View {
                         viewModel.fetchStockList()
                     }
                    .searchable(text: $searchText, prompt: "Search stocks")
-                       
+                   .toast(toastView: ToastView(dataModel: ToastDataModel(title: "Added to watchlist", image: "star"), show: $showToast), show: $showToast)
                }
     }
 }
@@ -94,11 +97,12 @@ struct StockRow: View {
     }
 }
 
-//#Preview {
-//    let mockViewModel = StockListViewModel()
-//    mockViewModel.stocks = [
-//        StockListModel(symbol: "ABC", name: "ABC DEFG", exchange: "", assetType: "", ipoDate: "", delistingDate: "", status: ""),
-//        StockListModel(symbol: "TESC", name: "tesco", exchange: "", assetType: "", ipoDate: "", delistingDate: "", status: "")
-//       ]
-//    StockListView(viewModel: mockViewModel)
-//}
+#Preview {
+    let mockViewModel = StockListViewModel()
+    mockViewModel.stocks = [
+        StockListModel(symbol: "AA", name: "Apple Inc.", exchange: "", assetType: "", ipoDate: "", delistingDate: "", status: ""),
+        StockListModel(symbol: "TESC", name: "tesco", exchange: "", assetType: "", ipoDate: "", delistingDate: "", status: "")
+       ]
+    return StockListView(viewModel: mockViewModel)
+        .environmentObject(MyWatchlistViewModel())
+}
