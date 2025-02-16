@@ -39,7 +39,7 @@ class MyWatchlistViewModel: BaseViewModel {
         }
     }
 
-    private func loadWatchlist() {
+    func loadWatchlist() {
         if let savedData = UserDefaults.standard.data(forKey: watchlistKey) {
             let decoder = JSONDecoder()
             if let decoded = try? decoder.decode([StockListModel].self, from: savedData) {

@@ -50,6 +50,9 @@ struct MyWatchlistView: View {
                      .listStyle(.plain)
                  }
              }
+             .onAppear {
+                 viewModel.loadWatchlist()
+             }
              .navigationTitle("My Watchlist")
              .navigationBarTitleDisplayMode(.inline)
                  .toolbar {

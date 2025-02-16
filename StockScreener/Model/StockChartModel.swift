@@ -12,7 +12,28 @@ struct TimeSeriesResponse: Decodable {
 
     enum CodingKeys: String, CodingKey {
         case metaData = "Meta Data"
-        case timeSeries = "Monthly Time Series"
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        metaData = try container.decode(MetaData.self, forKey: .metaData)
+
+        let fullContainer = try decoder.container(keyedBy: DynamicCodingKeys.self)
+
+        if let monthlyData = try? fullContainer.decode([String: StockData].self, forKey: DynamicCodingKeys(stringValue: "Monthly Time Series")!) {
+            timeSeries = monthlyData
+        } else if let dailyData = try? fullContainer.decode([String: StockData].self, forKey: DynamicCodingKeys(stringValue: "Time Series (Daily)")!) {
+            timeSeries = dailyData
+        } else {
+            throw DecodingError.dataCorruptedError(forKey: DynamicCodingKeys(stringValue: "TimeSeries")!, in: fullContainer, debugDescription: "Neither 'Monthly Time Series' nor 'Time Series (Daily)' found")
+        }
+    }
+
+    private struct DynamicCodingKeys: CodingKey {
+        var stringValue: String
+        init?(stringValue: String) { self.stringValue = stringValue }
+        var intValue: Int? { return nil }
+        init?(intValue: Int) { return nil }
     }
 }
 
@@ -20,13 +41,11 @@ struct MetaData: Decodable {
     let information: String
     let symbol: String
     let lastRefreshed: String
-    let timeZone: String
 
     enum CodingKeys: String, CodingKey {
         case information = "1. Information"
         case symbol = "2. Symbol"
         case lastRefreshed = "3. Last Refreshed"
-        case timeZone = "4. Time Zone"
     }
 }
 
