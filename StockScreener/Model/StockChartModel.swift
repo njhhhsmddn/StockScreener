@@ -13,7 +13,12 @@ struct TimeSeriesResponse: Decodable {
     enum CodingKeys: String, CodingKey {
         case metaData = "Meta Data"
     }
-
+    
+    init(metaData: MetaData, timeSeries: [String: StockData]) {
+        self.metaData = metaData
+        self.timeSeries = timeSeries
+    }
+    
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         metaData = try container.decode(MetaData.self, forKey: .metaData)

@@ -20,55 +20,58 @@ struct StockListView: View {
             } else {
                 return viewModel.stocks.filter {
                     $0.symbol.lowercased().contains(searchText.lowercased())
-                }
             }
         }
+    }
     
     var body: some View {
         NavigationView {
-                   VStack {
-                       // Stock List with searchable
-                       if viewModel.isLoading {
-                            ProgressView("Loading...")
-                        } else if let errorMessage = viewModel.errorMessage {
-                            Text(errorMessage)
-                            .foregroundColor(.red)
-                            .padding()
-                        } else if viewModel.stocks.isEmpty {
-                            Text("No data available.")
-                            .foregroundColor(.gray)
-                            .padding()
-                        } else if filteredStocks.isEmpty && !searchText.isEmpty {
-                            Text("No match found.")
-                            .foregroundColor(.gray)
-                            .padding()
-                        } else {
-                            List(filteredStocks) { stock in
-                                HStack{
-                                    NavigationLink(destination: StockDetailsView(stock: stock)) {
-                                        StockRow(stock: stock, isWatchlisted: watchlistViewModel.watchlist.contains(where: { $0.symbol == stock.symbol })) {
-                                            watchlistViewModel.toggleWatchlist(stock: stock)
-                                            if watchlistViewModel.watchlist.contains(where: { $0.symbol == stock.symbol }) {
-                                                showToast.toggle()
-                                            }
-                                            }
-                                        }
-                                        .background(Color.teal.gradient, in: RoundedRectangle(cornerRadius: 10))
-                                        .listRowSeparator(.hidden)
+            VStack {
+                if viewModel.isLoading {
+                    ProgressView("Loading...")
+                } else if let errorMessage = viewModel.errorMessage {
+                    // View when got error message
+                    Text(errorMessage)
+                        .foregroundColor(.red)
+                        .padding()
+                } else if viewModel.stocks.isEmpty {
+                    // View when no data
+                    Text("No data available.")
+                        .foregroundColor(.gray)
+                        .padding()
+                } else if filteredStocks.isEmpty && !searchText.isEmpty {
+                    // View when searching got no match data
+                    Text("No match found.")
+                        .foregroundColor(.gray)
+                        .padding()
+                } else {
+                    // Stock List with searchable
+                    List(filteredStocks) { stock in
+                        HStack{
+                            NavigationLink(destination: StockDetailsView(stock: stock)) {
+                                StockRow(stock: stock, isWatchlisted: watchlistViewModel.watchlist.contains(where: { $0.symbol == stock.symbol })) {
+                                    watchlistViewModel.toggleWatchlist(stock: stock)
+                                    if watchlistViewModel.watchlist.contains(where: { $0.symbol == stock.symbol }) {
+                                        showToast.toggle()
                                     }
-                                    .listRowSeparator(.hidden)
-                                    .foregroundStyle(Color.clear)
                                 }
-                                .listStyle(PlainListStyle())
                             }
-                   }
-                   .navigationTitle("Stock Listings")
-                   .onAppear {
-                        viewModel.fetchStockList()
+                            .background(Color.teal.gradient, in: RoundedRectangle(cornerRadius: 10))
+                            .listRowSeparator(.hidden)
+                        }
+                        .listRowSeparator(.hidden)
+                        .foregroundStyle(Color.clear)
                     }
-                   .searchable(text: $searchText, prompt: "Search stocks")
-                   .toast(toastView: ToastView(dataModel: ToastDataModel(title: "Added to watchlist", image: "star"), show: $showToast), show: $showToast)
-               }
+                    .listStyle(PlainListStyle())
+                }
+            }
+            .navigationTitle("List of Stocks")
+            .onAppear {
+                viewModel.fetchStockList()
+            }
+            .searchable(text: $searchText, prompt: "Search stocks")
+            .toast(toastView: ToastView(dataModel: ToastDataModel(title: "Added to watchlist", image: "star"), show: $showToast), show: $showToast)
+        }
     }
 }
 
@@ -104,8 +107,24 @@ struct StockRow: View {
 #Preview {
     let mockViewModel = StockListViewModel()
     mockViewModel.stocks = [
-        StockListModel(symbol: "AA", name: "Apple Inc.", exchange: "", assetType: "", ipoDate: "", delistingDate: "", status: ""),
-        StockListModel(symbol: "TESC", name: "tesco", exchange: "", assetType: "", ipoDate: "", delistingDate: "", status: "")
+        StockListModel(
+            symbol: "A",
+            name: "Agilent Technologies Inc",
+            exchange: "NYSE",
+            assetType: "Stock",
+            ipoDate: "1999-11-18",
+            delistingDate: "",
+            status: "Active"
+        ),
+        StockListModel(
+            symbol: "AA",
+            name: "Alcoa Corp",
+            exchange: "NYSE",
+            assetType: "Stock",
+            ipoDate: "2016-10-18",
+            delistingDate: "",
+            status: "Active"
+        )
        ]
     return StockListView(viewModel: mockViewModel)
         .environmentObject(MyWatchlistViewModel())

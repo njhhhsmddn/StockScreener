@@ -15,7 +15,6 @@ enum StockTab {
 struct MainView: View {
     @StateObject var stockListViewModel = StockListViewModel()
     
-    
     var body: some View {
         TabView {
             StockListView(viewModel: stockListViewModel)

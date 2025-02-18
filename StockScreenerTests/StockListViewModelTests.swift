@@ -30,7 +30,7 @@ class StockListViewModelTests: XCTestCase {
     
     func testFetchStockList_Success() {
         // Given
-        let mockStocks = [StockListModel] = [
+        let mockStocks = [
             StockListModel(
                 symbol: "A",
                 name: "Agilent Technologies Inc",

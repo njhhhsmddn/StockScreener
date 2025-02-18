@@ -28,7 +28,7 @@ struct ToastView: View {
             .padding(.horizontal, 32)
             .background(
                 RoundedRectangle(cornerRadius: 20)
-                    .fill(.customGray) // Darker, modern background
+                    .fill(.customGray)
                     .shadow(color: .black.opacity(0.2), radius: 5, x: 0, y: 3)
             )
             .onTapGesture {
@@ -45,7 +45,7 @@ struct ToastView: View {
                 }
             }
         }
-        .frame(width: UIScreen.main.bounds.width / 1.5) // Slightly narrower
+        .frame(width: UIScreen.main.bounds.width / 1.5) 
     }
 
 }
@@ -56,11 +56,12 @@ struct ToastModifier : ViewModifier {
     let toastView: ToastView
     
     func body(content: Content) -> some View {
-        ZStack {
-            content
-            if show {
-                toastView
+        content.overlay(
+            Group {
+                if show {
+                    toastView
+                }
             }
-        }
+        )
     }
 }

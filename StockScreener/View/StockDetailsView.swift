@@ -14,116 +14,121 @@ struct StockDetailsView: View {
     let stock: StockListModel
     @StateObject var viewModel = StockDetailsViewModel()
     @State private var showToast = false
-
+    
     var body: some View {
-        ZStack {
-            if viewModel.isLoading {
-                CustomBackButtonView(action: { dismiss() })
-                ProgressView("Loading...")
-                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-            } else if let errorMessage = viewModel.errorMessage {
-                CustomBackButtonView(action: { dismiss() })
-                Text(errorMessage)
-                    .foregroundColor(.red)
-                    .padding()
-                    .multilineTextAlignment(.center)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-            } else {
-                VStack {
-                    // Normal content layout when not loading/error
-                    HStack {
-                        Button(action: { dismiss() }) {
-                            Image(systemName: "arrow.backward")
-                                .font(.title2)
-                                .foregroundColor(.blue)
-                                .padding(.vertical, 8)
-                                .contentShape(Rectangle())
-                        }
-                        Spacer()
-                        Button(action: {
-                            watchlistViewModel.toggleWatchlist(stock: stock)
-                            if watchlistViewModel.watchlist.contains(where: { $0.symbol == stock.symbol }) {
-                                showToast.toggle()
+        GeometryReader { geometry in
+            NavigationView {
+                ZStack {
+                    if viewModel.isLoading {
+                        CustomBackButtonView(action: { dismiss() })
+                        ProgressView("Loading...")
+                            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+                    } else if let errorMessage = viewModel.errorMessage {
+                        CustomBackButtonView(action: { dismiss() })
+                        Text(errorMessage)
+                            .foregroundColor(.red)
+                            .padding()
+                            .multilineTextAlignment(.center)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+                    } else {
+                        ScrollView {
+                            VStack {
+                                // Back button and Star button
+                                HStack {
+                                    Button(action: { dismiss() }) {
+                                        Image(systemName: "arrow.backward")
+                                            .font(.title2)
+                                            .foregroundColor(.blue)
+                                            .padding(.vertical, 8)
+                                            .contentShape(Rectangle())
+                                    }
+                                    Spacer()
+                                    Button(action: {
+                                        watchlistViewModel.toggleWatchlist(stock: stock)
+                                        if watchlistViewModel.watchlist.contains(where: { $0.symbol == stock.symbol }) {
+                                            showToast.toggle()
+                                        }
+                                        
+                                    }) {
+                                        Image(systemName: watchlistViewModel.watchlist.contains(where: { $0.symbol == stock.symbol }) ? "star.fill" : "star")
+                                            .foregroundColor(watchlistViewModel.watchlist.contains(where: { $0.symbol == stock.symbol }) ? .yellow : .gray)
+                                            .font(.title2)
+                                    }
+                                }
+                                .padding(.top, 20)
+                                .padding(.horizontal)
+                                
+                                // Stock Header
+                                HStack {
+                                    Image(systemName: "chart.line.uptrend.xyaxis")
+                                        .foregroundColor(.blue)
+                                        .imageScale(.large)
+                                    Text(viewModel.stockName)
+                                        .font(.title2)
+                                        .bold()
+                                }
+                                .padding(.horizontal)
+                                .frame(maxWidth: .infinity, alignment: .center)
+                                
+                                // Price and Change Info
+                                HStack {
+                                    Text("Current price:")
+                                        .font(.subheadline)
+                                        .fontWeight(.medium)
+                                    Text(viewModel.currentPrice != 0 ? "$\(String(format: "%.2f", viewModel.currentPrice))" : "$0")
+                                        .font(.title)
+                                        .bold()
+                                }
+                                .padding(.horizontal)
+                                
+                                // Chart
+                                LineChartView(stockPrices: viewModel.stockChart)
+                                
+                                // Market Info Cards
+                                VStack(spacing: 12) {
+                                    HStack(spacing: 16) {
+                                        ItemView(value: "$\(viewModel.marketCap)", title: "Market Cap")
+                                        ItemView(value: viewModel.dividendYield, title: "Dividend Yield")
+                                    }
+
+                                    Divider().padding(.horizontal)
+
+                                    HStack(spacing: 16) {
+                                        ItemView(value: viewModel.week52High != nil ? "$\(String(format: "%.2f", viewModel.week52High!))" : "N/A", title: "52-Week High")
+                                        ItemView(value: viewModel.week52Low != nil ? "$\(String(format: "%.2f", viewModel.week52Low!))" : "N/A", title: "52-Week Low")
+                                    }
+                                }
+                                .padding()
+                                .background(
+                                    RoundedRectangle(cornerRadius: 16)
+                                        .fill(Color.white)
+                                        .shadow(color: Color.black.opacity(0.1), radius: 6, x: 0, y: 4)
+                                )
+                                .padding(.horizontal)
                             }
-                            
-                        }) {
-                            Image(systemName: watchlistViewModel.watchlist.contains(where: { $0.symbol == stock.symbol }) ? "star.fill" : "star")
-                                .foregroundColor(watchlistViewModel.watchlist.contains(where: { $0.symbol == stock.symbol }) ? .yellow : .gray)
-                                .font(.title2)
-                        }
-                        .frame(width: 55, height: 55)
-                    }
-                    .padding(.horizontal)
-                    
-                    // Stock Header
-                    HStack {
-                        Image(systemName: "chart.line.uptrend.xyaxis")
-                            .foregroundColor(.blue)
-                            .imageScale(.large)
-                        Text(viewModel.stockName)
-                            .font(.title2)
-                            .bold()
-                    }
-                    .padding(.horizontal)
-
-                    // Price and Change Info
-                    HStack {
-                        Text("Current price:")
-                            .font(.subheadline)
-                            .fontWeight(.medium)
-                        Text(viewModel.currentPrice != 0 ? "$\(String(format: "%.2f", viewModel.currentPrice))" : "$0")
-                            .font(.title)
-                            .bold()
-                    }
-                    .padding(.horizontal)
-
-                    // Chart
-                    LineChartView(stockPrices: viewModel.stockChart)
-                        .frame(height: 400)
-                        .padding(.horizontal)
-
-                    // Market Info Cards
-                    VStack(spacing: 12) {
-                        HStack(spacing: 16) {
-                            ItemView(value: "$\(viewModel.marketCap)", title: "Market Cap")
-                            ItemView(value: viewModel.dividendYield, title: "Dividend Yield")
-                        }
-
-                        Divider().padding(.horizontal)
-
-                        HStack(spacing: 16) {
-                            ItemView(value: viewModel.week52High != nil ? "$\(String(format: "%.2f", viewModel.week52High!))" : "N/A", title: "52-Week High")
-                            ItemView(value: viewModel.week52Low != nil ? "$\(String(format: "%.2f", viewModel.week52Low!))" : "N/A", title: "52-Week Low")
                         }
                     }
-                    .padding()
-                    .background(
-                        RoundedRectangle(cornerRadius: 16)
-                            .fill(Color.white)
-                            .shadow(color: Color.black.opacity(0.1), radius: 6, x: 0, y: 4)
-                    )
-                    .padding(.horizontal)
                 }
             }
+            .padding(.horizontal)
+            .onAppear {
+                viewModel.fetchStockData(stock: stock)
+            }
+            .navigationBarTitle("")
+            .navigationBarHidden(true)
+            .navigationBarBackButtonHidden(true)
+            .toast(toastView: ToastView(dataModel: ToastDataModel(title: "Added to watchlist", image: "star"), show: $showToast), show: $showToast)
         }
-        .padding(.horizontal)
-        .onAppear {
-            viewModel.fetchStockData(stock: stock)
-        }
-        .navigationBarTitle("")
-        .navigationBarHidden(true)
-        .navigationBarBackButtonHidden(true)
-        .toast(toastView: ToastView(dataModel: ToastDataModel(title: "Added to watchlist", image: "star"), show: $showToast), show: $showToast)
     }
 }
 
 #Preview {
     let mockStock = StockListModel(
-        symbol: "AAPL",
-        name: "Apple Inc.",
-        exchange: "NASDAQ",
+        symbol: "A",
+        name: "Agilent Technologies Inc",
+        exchange: "NYSE",
         assetType: "Stock",
-        ipoDate: "1980-12-12",
+        ipoDate: "1999-11-18",
         delistingDate: "",
         status: "Active"
     )
@@ -151,29 +156,31 @@ struct StockDetailsView: View {
 }
 
 
+// Bar Back button
 struct CustomBackButtonView: View {
     let action: () -> Void
 
     var body: some View {
         VStack {
-            // Back button at the top-left
             HStack {
                 Button(action: action) {
                     Image(systemName: "arrow.backward")
+                        .font(.title2)
                         .foregroundColor(.blue)
                         .padding()
                         .contentShape(Rectangle())
                 }
-                Spacer() // Pushes button to the left
+                Spacer()
             }
             .frame(maxWidth: .infinity, alignment: .leading) // Ensures it stays on the left
-            .padding(.top, 16) // Adds spacing from the top
+            .padding(.top, 16)
             
             Spacer() // Pushes content to center
         }
     }
 }
 
+// Item in Market Info Card
 struct ItemView: View {
     let value: String
     let title: String
@@ -190,6 +197,7 @@ struct ItemView: View {
     }
 }
 
+// Chart View
 struct LineChartView: View {
     let stockPrices: [(Date, Double)]
     
@@ -211,7 +219,7 @@ struct LineChartView: View {
             ForEach(stockPrices, id: \.0) { (date, closePrice) in
                 AreaMark(
                     x: .value("Date", date, unit: .month),
-                    yStart: .value("Close Price", 20),
+                    yStart: .value("Close Price", 0),
                     yEnd: .value("Close Price",  closePrice)
                 )
               .foregroundStyle(gradientColor)
