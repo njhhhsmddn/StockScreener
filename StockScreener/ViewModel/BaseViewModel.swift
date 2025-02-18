@@ -60,10 +60,6 @@ class BaseViewModel: ObservableObject {
                 switch result {
                 case .success(let data):
                     do {
-                        if let jsonString = String(data: data, encoding: .utf8) {
-                            print("Raw API Response: \(jsonString)") // Debug output
-                        }
-                                    
                         let decodedData = try JSONDecoder().decode(T.self, from: data)
                         self.cacheResponse(data, forKey: url)
                         return decodedData

@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import Network
 
 class APIService {
     static let shared = APIService()
@@ -32,8 +33,10 @@ class APIService {
                         let csvData = self.parseCSV(csvString)
                         return try JSONEncoder().encode(csvData) // Convert CSV to JSON format
                     }
-                    
-                    
+                } else if let csvString = String(data: output.data, encoding: .utf8) {
+                    if csvString == "{}" {
+                        throw APIError.emptyData
+                    } 
                 }
                 
                 return output.data
