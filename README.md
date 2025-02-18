@@ -113,12 +113,10 @@ Stock Screener App follows the MVVM (Model-View-ViewModel) architecture pattern:
 
 
 ## Screenshot of Application
-<a List of Stocks>
+
 <img src="https://github.com/user-attachments/assets/1368253c-11b3-4387-aaef-7215643b59ab" width="200">
-  <a Stock Details>
-  <img src="https://github.com/user-attachments/assets/b764c27b-085b-4e32-b63b-21c7e2daf38a" width="200">
-  <a My Watchlist>
-  <img src="https://github.com/user-attachments/assets/167c861d-e3e8-4baa-b791-a18a7ebee5d4" width="200">
+<img src="https://github.com/user-attachments/assets/b764c27b-085b-4e32-b63b-21c7e2daf38a" width="200">
+<img src="https://github.com/user-attachments/assets/167c861d-e3e8-4baa-b791-a18a7ebee5d4" width="200">
 
 
 

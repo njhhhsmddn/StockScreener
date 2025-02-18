@@ -10,7 +10,7 @@ import Combine
 
 class MyWatchlistViewModel: BaseViewModel {
     private var cancellables = Set<AnyCancellable>()
-    @Published var stockDetails: [String: (currentPrice: Double, percentageChange: Double)] = [:]
+    @Published var stockDetails: [String: (currentPrice: Double, percentageChange: Double)] = [:] // Pass stock details using Dictionary
     @Published var watchlist: [StockListModel] = [] {
         didSet {
             saveWatchlist()
@@ -88,6 +88,7 @@ class MyWatchlistViewModel: BaseViewModel {
                         print("Current Price: \(currentPrice), Previous Price: \(previousPrice)")
                         print("Percentage Change: \(formattedPercentageChange)%")
                         
+                        // Set value for current price and percentage change
                         self?.stockDetails[stock.symbol] = (currentPrice: currentPrice, percentageChange: formattedPercentageChange)
                         
                     }

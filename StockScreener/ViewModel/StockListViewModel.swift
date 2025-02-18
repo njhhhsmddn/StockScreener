@@ -23,7 +23,7 @@ class StockListViewModel: BaseViewModel {
                 }
             }, receiveValue: { [weak self] (result: [StockListModel]) in
                 DispatchQueue.main.async {
-                    self?.stocks = result.filter { $0.assetType == "Stock" } // filter only shows assetType == "Stock" not "ETF"
+                    self?.stocks = result.filter { $0.assetType == "Stock" } // Filter only shows when assetType == "Stock" not "ETF"
                 }
             })
             .store(in: &cancellables)

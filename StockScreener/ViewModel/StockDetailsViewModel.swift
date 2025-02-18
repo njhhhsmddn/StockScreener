@@ -16,7 +16,7 @@ class StockDetailsViewModel: BaseViewModel {
     @Published var dividendYield: String = "N/A"
     @Published var week52High: Double?
     @Published var week52Low: Double?
-    @Published var stockName: String = "Loading..."
+    @Published var stockName: String = "N/A"
    
     
     func fetchStockData(stock: StockListModel) {
@@ -77,19 +77,10 @@ class StockDetailsViewModel: BaseViewModel {
 
                     // Take the latest 12 months
                     self?.stockChart = Array(sortedPrices.prefix(12))
-    
-                    // Calculate percentage change
-                    if let currentPrice = sortedPrices.first?.1,
-                       let previousPrice = sortedPrices.dropFirst().first?.1 {
-                        
-                        let percentageChange = ((currentPrice - previousPrice) / previousPrice) * 100
-                        let formattedPercentageChange = String(format: "%.2f", percentageChange)
-                        print("Current Price: \(currentPrice), Previous Price: \(previousPrice)")
-                        print("Percentage Change: \(formattedPercentageChange)%")
-                        
-                        
+                    
+                    // Get current price
+                    if let currentPrice = sortedPrices.first?.1 {
                         self?.currentPrice = currentPrice
-//                        self?.percentageChange = Double(formattedPercentageChange) ?? 0
                     }
                 }
             })
